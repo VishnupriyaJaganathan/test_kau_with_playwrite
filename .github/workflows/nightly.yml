@@ -24,8 +24,7 @@ jobs:
           playwright install --with-deps
 
       - name: Run Playwright script
-        run: |
-          python test_kau.py
+        run: python test_kau.py
 
       - name: Upload screenshots & traces (if any)
         uses: actions/upload-artifact@v4
@@ -34,4 +33,3 @@ jobs:
           path: |
             *.png
             *.zip
-:
