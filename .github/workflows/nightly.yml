@@ -1,0 +1,37 @@
+name: Nightly Playwright Run
+
+on:
+  schedule:
+    - cron: "0 0 * * *"    # runs nightly at 00:00 UTC
+  workflow_dispatch:        # allows manual trigger from GitHub
+
+jobs:
+  run-playwright:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install playwright
+          playwright install --with-deps
+
+      - name: Run Playwright script
+        run: |
+          python test_kau.py
+
+      - name: Upload screenshots & traces (if any)
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: |
+            *.png
+            *.zip
+:
