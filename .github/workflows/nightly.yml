@@ -25,8 +25,8 @@ jobs:
           pip install pytest
           playwright install chromium
 
-      - name: Run Playwright script
-        run: python -m pytest -s -v tests
+      - name: Run tests with xvfb
+        run: xvfb-run -a python -m pytest -s -v tests/
         working-directory: playwright-kau
 
       - name: Upload screenshots & traces (if any)
