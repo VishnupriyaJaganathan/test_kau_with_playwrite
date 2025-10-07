@@ -24,7 +24,7 @@ jobs:
           playwright install --with-deps
 
       - name: Run Playwright script
-        run: python -m pytest -s -v tests/test_kau.py
+        run: python -m pytest -s -v tests
 
       - name: Upload screenshots & traces (if any)
         uses: actions/upload-artifact@v4
