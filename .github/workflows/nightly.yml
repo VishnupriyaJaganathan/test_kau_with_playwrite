@@ -23,6 +23,7 @@ jobs:
           pip install playwright
           playwright install --with-deps
           pip install pytest
+          playwright install chromium
 
       - name: Run Playwright script
         run: python -m pytest -s -v tests
