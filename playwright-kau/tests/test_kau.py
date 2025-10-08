@@ -13,7 +13,7 @@ def test_kau_homepage():
         title_1=page.title()
         print(title_1)
         # ✅ Example 1: check title
-        assert "xxx xx" in page.title()
+        assert "Karlstads universitet" in page.title()
 
         # ✅ Example 2: search for "IT"
         page.click("//button[contains(@class, 'js-search-modal-toggle')]")  # open search box
