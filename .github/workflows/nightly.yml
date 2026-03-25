@@ -45,7 +45,13 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
+      - name: Download test report
+        uses: actions/download-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-kau/
+
       - name: Deploy report to GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: playwright-kau/report.html
+          path: playwright-kau/
