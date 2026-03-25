@@ -1,27 +1,34 @@
-from playwright.sync_api import sync_playwright
+import pytest
+from playwright.sync_api import Page, expect
 
 
-def test_kau_homepage():
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)  # False = see the browser
-        page = browser.new_page()
+def test_kau_homepage(page: Page):
+    page.goto("https://www.kau.se/")
 
-        # Go to Karlstad University website
-        page.goto("https://www.kau.se/")
-        page.click("//*[@id='WSA_CLOSE']")
-        page.click("//button[contains(text(),'Jag godkänner enbart att ni använder nödvändiga cookies')]")
-        title_1=page.title()
-        print(title_1)
-        # ✅ Example 1: check title
-        assert "Karlstads universitet" in page.title()
+    # Close cookie/popup banner if present
+    close_btn = page.locator("#WSA_CLOSE")
+    if close_btn.is_visible(timeout=3000):
+        close_btn.click()
 
-        # ✅ Example 2: search for "IT"
-        page.click("//button[contains(@class, 'js-search-modal-toggle')]")  # open search box
-        page.fill("//input[@type='search']", "IT")
-        page.press("//input[@type='search']", "Enter")
+    # Accept only necessary cookies if the dialog appears
+    cookie_btn = page.get_by_role("button", name="Jag godkänner enbart att ni använder nödvändiga cookies")
+    if cookie_btn.is_visible(timeout=3000):
+        cookie_btn.click()
 
-        # Wait for results
-        page.wait_for_selector("//p[contains(text(), 'Din sökning på')]")
-        assert "IT" in page.inner_text("//p[contains(text(), 'Din sökning på')]")
+    # ✅ Example 1: Check title
+    expect(page).to_have_title("Karlstads universitet")
 
-        browser.close()
+    # ✅ Example 2: Search for "IT"
+    search_toggle = page.locator("button.js-search-modal-toggle")
+    search_toggle.wait_for(state="visible")
+    search_toggle.click()
+
+    search_input = page.locator("input[type='search']")
+    search_input.wait_for(state="visible")
+    search_input.fill("IT")
+    search_input.press("Enter")
+
+    # Wait for search results text to appear
+    result_text = page.locator("p:has-text('Din sökning på')")
+    result_text.wait_for(state="visible")
+    expect(result_text).to_contain_text("IT")
