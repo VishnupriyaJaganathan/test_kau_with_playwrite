@@ -1,38 +1,32 @@
-name: Nightly Playwright Run
+name: Playwright Tests
 
 on:
-  schedule:
-    - cron: "0 0 * * *"    # runs nightly at 00:00 UTC
-  workflow_dispatch:        # allows manual trigger from GitHub
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  run-playwright:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: '3.11'
 
       - name: Install dependencies
         run: |
-          pip install playwright
-          playwright install --with-deps
-          pip install pytest
-          playwright install chromium
+          pip install pytest playwright pytest-playwright
 
-      - name: Run tests with xvfb
-        run: xvfb-run -a python -m pytest -s -v tests/
-        working-directory: playwright-kau
+      - name: Install Playwright browsers
+        run: playwright install chromium
 
-      - name: Upload screenshots & traces (if any)
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-artifacts
-          path: |
-            *.png
-            *.zip
+      - name: Run tests
+        run: |
+          cd playwright-kau
+          pytest tests/ --browser chromium --headed --screenshot only-on-failure
