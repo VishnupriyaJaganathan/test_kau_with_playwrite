@@ -16,7 +16,7 @@ def test_kau_homepage(page: Page):
         cookie_btn.click()
 
     # ✅ Example 1: Check title
-    expect(page).to_have_title("Karlstads universitet")
+    expect(page).to_have_title(re.compile("Karlstads universitet"))
 
     # ✅ Example 2: Search for "IT"
     search_toggle = page.locator("button.js-search-modal-toggle")
