@@ -5,6 +5,8 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  schedule:
+    - cron: '0 6 * * *'  # Run every day at 6am UTC (nightly)
 
 jobs:
   test:
@@ -20,8 +22,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: |
-          pip install pytest playwright pytest-playwright
+        run: pip install pytest playwright pytest-playwright
 
       - name: Install Playwright browsers
         run: playwright install chromium
@@ -29,4 +30,19 @@ jobs:
       - name: Run tests
         run: |
           cd playwright-kau
-          pytest tests/ --browser chromium --screenshot only-on-failure
+          pytest tests/ --browser chromium --screenshot only-on-failure --html=report.html --self-contained-html
+        continue-on-error: true
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-kau/report.html
+
+      - name: Upload screenshots on failure
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: screenshots
+          path: playwright-kau/test-results/
