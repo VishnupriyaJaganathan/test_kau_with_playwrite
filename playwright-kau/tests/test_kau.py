@@ -19,7 +19,7 @@ def test_kau_homepage(page: Page):
     expect(page).to_have_title(re.compile("Karlstads universitet"))
 
     # ✅ Example 2: Search for "IT"
-    search_toggle = page.locator("button.js-search-modal-toggle")
+    search_toggle = page.get_by_label("Search").first
     search_toggle.wait_for(state="visible")
     search_toggle.click()
 
