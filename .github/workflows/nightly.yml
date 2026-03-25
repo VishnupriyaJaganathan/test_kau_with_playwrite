@@ -6,12 +6,11 @@ on:
   pull_request:
     branches: [ main ]
   schedule:
-    - cron: '0 6 * * *'  # Run every day at 6am UTC (nightly)
+    - cron: '0 6 * * *'
 
 jobs:
-  test:
+  test:                          # ← first job
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -22,7 +21,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install pytest playwright pytest-playwright
+        run: pip install pytest playwright pytest-playwright pytest-html
 
       - name: Install Playwright browsers
         run: playwright install chromium
@@ -40,9 +39,12 @@ jobs:
           name: playwright-report
           path: playwright-kau/report.html
 
-      - name: Upload screenshots on failure
-        uses: actions/upload-artifact@v3
-        if: always()
+  publish-report:                # ← second job, same level as "test"
+    needs: test
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Deploy report to GitHub Pages
+        uses: actions/upload-pages-artifact@v2
         with:
-          name: screenshots
-          path: playwright-kau/test-results/
+          path: playwright-kau/report.html
